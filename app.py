@@ -1,15 +1,15 @@
-import streamlit as st
 import pandas as pd
 import plotly.express as px
+import streamlit as st
 
-# --- Configuração da Página ---
-# Define o título da página, o ícone e o layout para ocupar a largura inteira.
+
+# Configuração da página
+# Define o título, ícone e layout da página
 st.set_page_config(
-    page_title="Dashboard de Salários na Área de Dados",
+    page_title="Dashboard de salários na Àrea de Dados",
     page_icon="📊",
     layout="wide",
 )
-
 # --- Carregamento dos dados ---
 df = pd.read_csv("https://raw.githubusercontent.com/vqrca/dashboard_salarios_dados/refs/heads/main/dados-imersao-final.csv")
 
@@ -74,6 +74,8 @@ with col_graf1:
         top_cargos = df_filtrado.groupby('cargo')['usd'].mean().nlargest(10).sort_values(ascending=True).reset_index()
         grafico_cargos = px.bar(
             top_cargos,
+            color='usd',
+            color_continuous_scale='Reds',
             x='usd',
             y='cargo',
             orientation='h',
@@ -89,8 +91,9 @@ with col_graf2:
     if not df_filtrado.empty:
         grafico_hist = px.histogram(
             df_filtrado,
+            color_discrete_sequence=['#8b0000'],
             x='usd',
-            nbins=30,
+            nbins=20,
             title="Distribuição de salários anuais",
             labels={'usd': 'Faixa salarial (USD)', 'count': ''}
         )
@@ -110,7 +113,8 @@ with col_graf3:
             names='tipo_trabalho',
             values='quantidade',
             title='Proporção dos tipos de trabalho',
-            hole=0.5  
+            hole=0.5,
+            color_discrete_sequence=["#d12525", "#850606", "#e67777"],
         )
         grafico_remoto.update_traces(textinfo='percent+label')
         grafico_remoto.update_layout(title_x=0.1)
@@ -125,13 +129,13 @@ with col_graf4:
         grafico_paises = px.choropleth(media_ds_pais,
             locations='residencia_iso3',
             color='usd',
-            color_continuous_scale='rdylgn',
+            color_continuous_scale='Reds',
             title='Salário médio de Cientista de Dados por país',
             labels={'usd': 'Salário médio (USD)', 'residencia_iso3': 'País'})
         grafico_paises.update_layout(title_x=0.1)
         st.plotly_chart(grafico_paises, use_container_width=True)
     else:
-        st.warning("Nenhum dado para exibir no gráfico de países.") 
+        st.warning("Nenhum dado para exibir no gráfico de países.")
 
 # --- Tabela de Dados Detalhados ---
 st.subheader("Dados Detalhados")
